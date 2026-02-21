@@ -3,6 +3,7 @@ package server
 import (
 	"backend/db"
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -22,6 +23,7 @@ func Register(c *fiber.Ctx) error {
 		Password string `json:"password"`
 		FullName string `json:"full_name"`
 		Avatar   string `json:"avatar"`
+		Role     string `json:"role"`
 	}
 
 	var input RegisterInput
@@ -34,10 +36,12 @@ func Register(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Internal server error"})
 	}
 
-	_, err = db.DB.Exec("INSERT INTO users (email, password_hash, full_name, avatar, provider) VALUES ($1, $2, $3, $4, $5)",
-		input.Email, string(hash), input.FullName, input.Avatar, "email")
+	_, err = db.DB.Exec("INSERT INTO users (email, password_hash, full_name, avatar, role, provider) VALUES ($1, $2, $3, $4, $5, $6)",
+		input.Email, string(hash), input.FullName, input.Avatar, input.Role, "email")
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"error": "User already exists"})
+		// Log the actual error for debugging
+		fmt.Printf("Registration error for %s: %v\n", input.Email, err)
+		return c.Status(400).JSON(fiber.Map{"error": "Registration failed. User may already exist or there is a database error."})
 	}
 
 	return c.JSON(fiber.Map{"message": "Registration successful"})
@@ -56,8 +60,8 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	var user db.User
-	err := db.DB.QueryRow("SELECT id, email, password_hash, full_name, avatar FROM users WHERE email = $1", input.Email).
-		Scan(&user.ID, &user.Email, &user.PasswordHash, &user.FullName, &user.Avatar)
+	err := db.DB.QueryRow("SELECT id, email, password_hash, full_name, avatar, role FROM users WHERE email = $1", input.Email).
+		Scan(&user.ID, &user.Email, &user.PasswordHash, &user.FullName, &user.Avatar, &user.Role)
 
 	if err != nil || !user.PasswordHash.Valid {
 		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
@@ -68,7 +72,7 @@ func Login(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
 	}
 
-	token, _ := generateJWT(user.ID, user.Email)
+	token, _ := generateJWT(user.ID, user.Email, user.Role)
 	return c.JSON(fiber.Map{"token": token, "user": user})
 }
 
@@ -91,6 +95,7 @@ func AuthRequired(c *fiber.Ctx) error {
 
 	claims := token.Claims.(jwt.MapClaims)
 	c.Locals("user_id", int(claims["user_id"].(float64)))
+	c.Locals("role", claims["role"].(string))
 	return c.Next()
 }
 
@@ -98,8 +103,8 @@ func AuthRequired(c *fiber.Ctx) error {
 func Me(c *fiber.Ctx) error {
 	userID := c.Locals("user_id").(int)
 	var user db.User
-	err := db.DB.QueryRow("SELECT id, email, full_name, avatar, provider, provider_id FROM users WHERE id = $1", userID).
-		Scan(&user.ID, &user.Email, &user.FullName, &user.Avatar, &user.Provider, &user.ProviderID)
+	err := db.DB.QueryRow("SELECT id, email, full_name, avatar, role, provider, provider_id FROM users WHERE id = $1", userID).
+		Scan(&user.ID, &user.Email, &user.FullName, &user.Avatar, &user.Role, &user.Provider, &user.ProviderID)
 
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "User not found"})
@@ -137,22 +142,23 @@ func GoogleLogin(c *fiber.Ctx) error {
 		VALUES ($1, $2, $3, $4, $5)
 		ON CONFLICT (provider, provider_id) DO UPDATE 
 		SET full_name = EXCLUDED.full_name, avatar = EXCLUDED.avatar
-		RETURNING id, email, full_name, avatar`,
+		RETURNING id, email, full_name, avatar, role`,
 		email, name, avatar, "google", sub).
-		Scan(&user.ID, &user.Email, &user.FullName, &user.Avatar)
+		Scan(&user.ID, &user.Email, &user.FullName, &user.Avatar, &user.Role)
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to handle Google login"})
 	}
 
-	token, _ := generateJWT(user.ID, user.Email)
+	token, _ := generateJWT(user.ID, user.Email, user.Role)
 	return c.JSON(fiber.Map{"token": token, "user": user})
 }
 
-func generateJWT(userID int, email string) (string, error) {
+func generateJWT(userID int, email string, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID,
 		"email":   email,
+		"role":    role,
 		"exp":     time.Now().Add(time.Hour * 72).Unix(),
 	})
 

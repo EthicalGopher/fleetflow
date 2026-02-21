@@ -17,6 +17,7 @@ type User struct {
 	PasswordHash sql.NullString `json:"-"`
 	FullName     string         `json:"full_name"`
 	Avatar       string         `json:"avatar"`
+	Role         string         `json:"role"`
 	Provider     string         `json:"provider"`    // e.g., 'email', 'google', 'github'
 	ProviderID   sql.NullString `json:"provider_id"` // OAuth subject ID
 	CreatedAt    string         `json:"created_at"`
@@ -51,6 +52,7 @@ func Connect() {
 		password_hash TEXT,
 		full_name TEXT,
 		avatar TEXT,
+		role TEXT DEFAULT 'user',
 		provider TEXT DEFAULT 'email',
 		provider_id TEXT,
 		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -61,5 +63,19 @@ func Connect() {
 	_, err = DB.Exec(createTableQuery)
 	if err != nil {
 		log.Fatal("Failed to create users table:", err)
+	}
+
+	// Ensure 'role' column exists in case the table was created before the role field was added
+	alterTableQuery := `
+	DO $$ 
+	BEGIN 
+		IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='role') THEN
+			ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user';
+		END IF;
+	END $$;`
+
+	_, err = DB.Exec(alterTableQuery)
+	if err != nil {
+		log.Println("Note: Could not ensure 'role' column via ALTER TABLE:", err)
 	}
 }
