@@ -109,7 +109,10 @@ func Connect() {
 		origin TEXT NOT NULL,
 		destination TEXT NOT NULL,
 		status TEXT DEFAULT 'Pending',
-		eta TEXT
+		eta TEXT,
+		driver_id TEXT REFERENCES drivers(id),
+		vehicle_id TEXT REFERENCES vehicles(id),
+		task_message TEXT
 	);
 
 	CREATE TABLE IF NOT EXISTS expenses (
@@ -141,6 +144,26 @@ func Connect() {
 	_, err = DB.Exec(businessTablesQuery)
 	if err != nil {
 		log.Fatal("Failed to create business tables:", err)
+	}
+
+	// Ensure all columns exist in shipments (for existing DBs)
+	alterShipmentsQuery := `
+	DO $$ 
+	BEGIN 
+		IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='shipments' AND column_name='driver_id') THEN
+			ALTER TABLE shipments ADD COLUMN driver_id TEXT REFERENCES drivers(id);
+		END IF;
+		IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='shipments' AND column_name='vehicle_id') THEN
+			ALTER TABLE shipments ADD COLUMN vehicle_id TEXT REFERENCES vehicles(id);
+		END IF;
+		IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='shipments' AND column_name='task_message') THEN
+			ALTER TABLE shipments ADD COLUMN task_message TEXT;
+		END IF;
+	END $$;`
+
+	_, err = DB.Exec(alterShipmentsQuery)
+	if err != nil {
+		log.Println("Note: Could not alter shipments table:", err)
 	}
 
 	// Seed Data

@@ -63,6 +63,8 @@ func main() {
 	app.Put("/drivers/:id", server.UpdateDriver)
 	app.Delete("/drivers/:id", server.DeleteDriver)
 	app.Get("/shipments", server.GetShipments)
+	app.Post("/shipments", server.CreateShipment)
+	app.Put("/shipments/:id", server.UpdateShipment)
 	app.Get("/expenses", server.GetExpenses)
 	app.Get("/incidents", server.GetIncidents)
 

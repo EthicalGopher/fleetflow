@@ -2,7 +2,9 @@ package server
 
 import (
 	"backend/db"
+	"database/sql"
 	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -321,9 +323,21 @@ func DeleteMaintenanceLog(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "Maintenance log deleted"})
 }
 
-// Shipment Handlers
+func DeleteShipment(c *fiber.Ctx) error {
+	id := c.Params("id")
+	_, err := db.DB.Exec("DELETE FROM shipments WHERE id=$1", id)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.JSON(fiber.Map{"message": "Shipment deleted"})
+}
+
 func GetShipments(c *fiber.Ctx) error {
-	rows, err := db.DB.Query("SELECT id, origin, destination, status, eta FROM shipments")
+	rows, err := db.DB.Query(`
+        SELECT s.id, s.origin, s.destination, s.status, s.eta, s.driver_id, d.name, d.phone, s.vehicle_id, v.make || ' ' || v.model, s.task_message 
+        FROM shipments s 
+        LEFT JOIN drivers d ON s.driver_id = d.id 
+        LEFT JOIN vehicles v ON s.vehicle_id = v.id`)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -332,16 +346,66 @@ func GetShipments(c *fiber.Ctx) error {
 	var shipments []fiber.Map
 	for rows.Next() {
 		var id, origin, destination, status, eta string
-		rows.Scan(&id, &origin, &destination, &status, &eta)
+		var driverID, driverName, driverPhone, vehicleID, vehicleName, taskMessage sql.NullString
+		rows.Scan(&id, &origin, &destination, &status, &eta, &driverID, &driverName, &driverPhone, &vehicleID, &vehicleName, &taskMessage)
 		shipments = append(shipments, fiber.Map{
-			"id":          id,
-			"origin":      origin,
-			"destination": destination,
-			"status":      status,
-			"eta":         eta,
+			"id":           id,
+			"origin":       origin,
+			"destination":  destination,
+			"status":       status,
+			"eta":          eta,
+			"driver_id":    driverID.String,
+			"driver_name":  driverName.String,
+			"driver_phone": driverPhone.String,
+			"vehicle_id":   vehicleID.String,
+			"vehicle_name": vehicleName.String,
+			"task_message": taskMessage.String,
 		})
 	}
 	return c.JSON(shipments)
+}
+
+func CreateShipment(c *fiber.Ctx) error {
+	type Input struct {
+		ID          string `json:"id"`
+		Origin      string `json:"origin"`
+		Destination string `json:"destination"`
+		Status      string `json:"status"`
+		ETA         string `json:"eta"`
+	}
+	var input Input
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid input"})
+	}
+
+	_, err := db.DB.Exec("INSERT INTO shipments (id, origin, destination, status, eta) VALUES ($1, $2, $3, $4, $5)",
+		input.ID, input.Origin, input.Destination, input.Status, input.ETA)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.Status(201).JSON(fiber.Map{"message": "Shipment created"})
+}
+
+func UpdateShipment(c *fiber.Ctx) error {
+	id := c.Params("id")
+	type Input struct {
+		DriverID    string `json:"driver_id"`
+		VehicleID   string `json:"vehicle_id"`
+		TaskMessage string `json:"task_message"`
+		Status      string `json:"status"`
+		ETA         string `json:"eta"`
+	}
+	var input Input
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid input"})
+	}
+
+	_, err := db.DB.Exec("UPDATE shipments SET driver_id=$1, vehicle_id=$2, task_message=$3, status=$4, eta=$5 WHERE id=$6",
+		input.DriverID, input.VehicleID, input.TaskMessage, input.Status, input.ETA, id)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.JSON(fiber.Map{"message": "Shipment updated"})
 }
 
 // Expense Handlers
