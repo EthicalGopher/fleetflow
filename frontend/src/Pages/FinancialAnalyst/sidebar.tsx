@@ -4,7 +4,6 @@ import {
     Users,
     Wrench,
     BarChart3,
-    Settings,
     LogOut,
     ChevronRight
 } from 'lucide-react';
@@ -12,7 +11,7 @@ import { cn } from '../../lib/utils';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from "../../assets/logo.png";
 
-export type ViewType = 'overview' | 'vehicles' | 'drivers' | 'maintenance' | 'reports' | 'settings';
+export type ViewType = 'overview' | 'vehicles' | 'drivers' | 'maintenance' | 'reports';
 
 export function Sidebar() {
     const location = useLocation();
@@ -30,7 +29,7 @@ export function Sidebar() {
         { id: 'overview', label: 'Overview', icon: LayoutDashboard, path: '/financial-analyst' },
         { id: 'vehicles', label: 'Vehicles', icon: Truck, path: '/financial-analyst/vehicles' },
         { id: 'drivers', label: 'Drivers', icon: Users, path: '/financial-analyst/drivers' },
-    
+
         { id: 'reports', label: 'Reports', icon: BarChart3, path: '/financial-analyst/reports' },
     ] as const;
 
@@ -66,19 +65,8 @@ export function Sidebar() {
             </nav>
 
             <div className="p-4 border-t border-white/10 space-y-2">
-                <Link
-                    to="/financial-analyst/settings"
-                    className={cn(
-                        "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
-                        activeView === 'settings'
-                            ? "bg-white/15 text-white"
-                            : "text-white/60 hover:bg-white/5 hover:text-white"
-                    )}
-                >
-                    <Settings className="size-5" />
-                    <span className="font-semibold text-sm">Settings</span>
-                </Link>
-                <button 
+
+                <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-rose-400 hover:bg-rose-400/10 transition-all"
                 >

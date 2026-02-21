@@ -76,7 +76,6 @@ export default function App() {
       case 'drivers': return { title: 'Driver Management', badge: 'Active' };
       case 'maintenance': return { title: 'Maintenance Hub', badge: 'Operations' };
       case 'reports': return { title: 'Fleet Reports', badge: 'Analytics' };
-      case 'settings': return { title: 'System Settings', badge: 'Admin' };
       default: return { title: 'FleetPro Dashboard' };
     }
   };
@@ -106,7 +105,6 @@ export default function App() {
                 <Route path="drivers" element={<div className="p-8"><EfficiencyChart /></div>} />
                 <Route path="reports" element={<div className="p-8"><AlertsList /></div>} />
                 <Route path="maintenance" element={<div className="flex items-center justify-center min-h-[400px] text-slate-400 font-bold uppercase tracking-widest">Maintenance module under development</div>} />
-                <Route path="settings" element={<div className="flex flex-col items-center justify-center min-h-[400px] text-slate-400"><h3 className="text-xl font-extrabold text-slate-800">System Settings</h3><p className="font-bold text-sm">Main settings module coming soon.</p></div>} />
               </Routes>
             </motion.div>
           </AnimatePresence>

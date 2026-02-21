@@ -1,4 +1,4 @@
-import { LayoutDashboard, Truck, Wrench, Users, BarChart, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Truck, Wrench, Users, BarChart, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { View } from '../types';
 import logo from "../../../assets/logo.png";
@@ -18,8 +18,8 @@ export default function Sidebar({ currentView, setCurrentView }: SidebarProps) {
     navigate('/auth');
   };
 
-  const initials = user.full_name 
-    ? user.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase() 
+  const initials = user.full_name
+    ? user.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase()
     : 'U';
 
   return (
@@ -32,35 +32,35 @@ export default function Sidebar({ currentView, setCurrentView }: SidebarProps) {
         </div>
       </div>
       <nav className="flex-1 px-4 py-6 space-y-1">
-        <button 
+        <button
           onClick={() => setCurrentView('dashboard')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'dashboard' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
         >
           <LayoutDashboard size={20} />
           Dashboard
         </button>
-        <button 
+        <button
           onClick={() => setCurrentView('registry')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'registry' || currentView === 'add-vehicle' || currentView === 'edit-vehicle' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
         >
           <Truck size={20} />
           Fleet Registry
         </button>
-        <button 
+        <button
           onClick={() => setCurrentView('maintenance')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'maintenance' || currentView === 'add-maintenance' || currentView === 'edit-maintenance' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
         >
           <Wrench size={20} />
           Maintenance Log
         </button>
-        <button 
+        <button
           onClick={() => setCurrentView('drivers')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'drivers' || currentView === 'add-driver' || currentView === 'edit-driver' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
         >
           <Users size={20} />
           Drivers
         </button>
-        <button 
+        <button
           onClick={() => setCurrentView('reports')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'reports' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
         >
@@ -69,10 +69,7 @@ export default function Sidebar({ currentView, setCurrentView }: SidebarProps) {
         </button>
       </nav>
       <div className="p-4 border-t border-white/10">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium mb-4">
-          <Settings size={20} />
-          Settings
-        </button>
+
         <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5">
           <div className="size-10 rounded-full bg-navy-primary flex items-center justify-center text-white font-bold border border-white/10 uppercase">
             {initials}
@@ -81,7 +78,7 @@ export default function Sidebar({ currentView, setCurrentView }: SidebarProps) {
             <p className="text-sm font-semibold text-white truncate">{user.full_name || 'User'}</p>
             <p className="text-xs text-white/40 truncate">{user.role || 'Guest'}</p>
           </div>
-          <button 
+          <button
             onClick={handleLogout}
             className="text-white/40 hover:text-white transition-colors"
           >
