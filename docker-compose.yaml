@@ -1,0 +1,72 @@
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: sankhya          # optional – change as you like
+      POSTGRES_DB: myapp              # optional – auto-created db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"                   # optional: expose to host (avoid conflict with local pg)
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "myapp", "-U", "sankhya"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    user: root
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+      PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: 10
+    ports:
+      - "8082:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"                   # or whatever port your Go API listens on
+    environment:
+      - DB_HOST=db                    # service name = hostname in docker network
+      - DB_PORT=5432
+      - DB_USER=sankhya
+      - DB_PASSWORD=example
+      - DB_NAME=myapp
+      - JWT_SECRET=your-very-secret-key-change-it
+      # Add other env vars your Go app needs (e.g. JWT_SECRET, PORT=8080)
+    depends_on:
+      db:
+        condition: service_healthy
+    # volumes:                        # optional – hot-reload in dev
+    #   - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5173:5173"                   # Vite default dev port
+    environment:
+      - VITE_API_URL=http://localhost:8080   # or http://backend:8080 in container
+    # volumes:                        # hot-reload (very useful!)
+    #   - ./frontend:/app
+    #   - /app/node_modules             # avoid overwriting node_modules
+    depends_on:
+      - backend
+
+volumes:
+  postgres-data:
+  pgadmin-data:
