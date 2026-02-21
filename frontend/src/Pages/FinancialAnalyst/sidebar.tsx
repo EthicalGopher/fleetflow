@@ -30,7 +30,7 @@ export function Sidebar() {
         { id: 'overview', label: 'Overview', icon: LayoutDashboard, path: '/financial-analyst' },
         { id: 'vehicles', label: 'Vehicles', icon: Truck, path: '/financial-analyst/vehicles' },
         { id: 'drivers', label: 'Drivers', icon: Users, path: '/financial-analyst/drivers' },
-        { id: 'maintenance', label: 'Maintenance', icon: Wrench, path: '/financial-analyst/maintenance' },
+    
         { id: 'reports', label: 'Reports', icon: BarChart3, path: '/financial-analyst/reports' },
     ] as const;
 
