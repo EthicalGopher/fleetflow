@@ -17,11 +17,11 @@ export default function DispatcherDashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
+    <div className="flex h-screen bg-ice-blue font-sans text-slate-900 overflow-hidden">
       <Sidebar currentView={currentView} setCurrentView={setCurrentView} />
       <main className="flex-1 ml-64 flex flex-col min-w-0 h-full">
         <Header title={getTitle()} />
-        <div className="flex-1 overflow-auto bg-slate-50 p-6">
+        <div className="flex-1 overflow-auto p-6">
           {currentView === 'shipments' && <ActiveShipments />}
           {currentView === 'assignments' && <DriverAssignment />}
         </div>

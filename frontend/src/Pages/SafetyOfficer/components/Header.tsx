@@ -1,10 +1,19 @@
 import { Bell, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   title: string;
 }
 
 export default function Header({ title }: HeaderProps) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/auth');
+  };
+
   return (
     <header className="bg-white shadow-sm p-4 border-b border-gray-200">
       <div className="flex justify-between items-center">
@@ -15,7 +24,10 @@ export default function Header({ title }: HeaderProps) {
             <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
           </button>
           <div className="h-6 w-px bg-slate-200 mx-2"></div>
-          <button className="flex items-center gap-2 text-sm text-slate-600 hover:text-red-600 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-red-50">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-sm text-slate-600 hover:text-red-600 font-medium transition-colors px-3 py-2 rounded-lg hover:bg-red-50"
+          >
             <LogOut size={18} />
             <span>Logout</span>
           </button>

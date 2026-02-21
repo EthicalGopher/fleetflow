@@ -5,6 +5,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
+import logo from "../assets/logo.png";
 
 // --- Utils ---
 function cn(...inputs: ClassValue[]) {
@@ -21,7 +22,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "default", ...props }, ref) => {
     const variants = {
-      default: "bg-blue-600 text-white hover:bg-blue-700 shadow-md",
+      default: "bg-navy-primary text-white hover:bg-navy-primary/90 shadow-md",
       outline: "border border-white text-white hover:bg-white/10",
       ghost: "hover:bg-accent hover:text-accent-foreground",
     };
@@ -180,168 +181,168 @@ const SigninandSignup = () => {
     }),
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 p-4 font-sans">
-      <div className="relative w-full max-w-[900px] h-[650px] bg-white rounded-[30px] shadow-2xl overflow-hidden flex">
-        
-        {/* Sign Up Form (Left Side) - Visible when isSignUp is true */}
-        <div
-          className={`absolute top-0 left-0 w-1/2 h-full flex flex-col justify-center items-center p-12 bg-white transition-all duration-[1200ms] ease-in-out ${
-            isSignUp ? "opacity-100 translate-x-0 z-20" : "opacity-0 translate-x-full z-10 pointer-events-none"
-          }`}
-        >
-          <form className="w-full flex flex-col items-center space-y-4" onSubmit={handleSubmit}>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Sign up</h1>
-            <div className="w-full space-y-3">
-              <Input
-                type="text"
-                placeholder="Full Name"
-                icon={<User className="w-5 h-5" />}
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required={isSignUp}
-              />
-              <Input
-                type="email"
-                placeholder="Email"
-                icon={<Mail className="w-5 h-5" />}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <Input
-                type="password"
-                placeholder="Password"
-                icon={<Lock className="w-5 h-5" />}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <Select
-                icon={<Briefcase className="w-5 h-5" />}
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                required={isSignUp}
-              >
-                <option value="Dispatcher">Dispatcher</option>
-                <option value="FinancialAnalyst">Financial Analyst</option>
-                <option value="FleetManager">Fleet Manager</option>
-                <option value="SafetyOfficer">Safety Officer</option>
-              </Select>
-            </div>
-            
-            {error && isSignUp && <p className="text-red-500 text-xs text-center">{error}</p>}
-
-            <Button type="submit" className="w-40 mt-4 bg-blue-600 hover:bg-blue-700">
-              SIGN UP
-            </Button>
-          </form>
-        </div>
-
-        {/* Sign In Form (Right Side) - Visible when !isSignUp */}
-        <div
-          className={`absolute top-0 right-0 w-1/2 h-full flex flex-col justify-center items-center p-12 bg-white transition-all duration-[1200ms] ease-in-out ${
-            !isSignUp ? "opacity-100 translate-x-0 z-20" : "opacity-0 -translate-x-full z-10 pointer-events-none"
-          }`}
-        >
-          <form className="w-full flex flex-col items-center space-y-4" onSubmit={handleSubmit}>
-            <h1 className="text-4xl font-bold text-gray-800 mb-6">Sign in</h1>
-            <div className="w-full space-y-4">
-              <Input
-                type="email"
-                placeholder="Email"
-                icon={<Mail className="w-5 h-5" />}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <Input
-                type="password"
-                placeholder="Password"
-                icon={<Lock className="w-5 h-5" />}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            {error && !isSignUp && <p className="text-red-500 text-xs text-center">{error}</p>}
-
-            <Button type="submit" className="w-40 mt-6 bg-blue-600 hover:bg-blue-700">
-              LOGIN
-            </Button>
-
-          </form>
-        </div>
-
-        {/* Overlay Container */}
-        <motion.div
-          className="absolute top-0 h-full z-50 overflow-hidden pointer-events-none"
-          initial={false}
-          animate={{
-            left: isSignUp ? ["0%", "0%", "50%"] : ["50%", "0%", "0%"],
-            width: ["50%", "100%", "50%"],
-            borderTopRightRadius: isSignUp ? ["100px", "100px", "0px"] : ["0px", "0px", "100px"],
-            borderBottomRightRadius: isSignUp ? ["100px", "100px", "0px"] : ["0px", "0px", "100px"],
-            borderTopLeftRadius: isSignUp ? ["0px", "0px", "100px"] : ["100px", "100px", "0px"],
-            borderBottomLeftRadius: isSignUp ? ["0px", "0px", "100px"] : ["100px", "100px", "0px"],
-          }}
-          transition={{ duration: 1.2, ease: "easeInOut" }}
-        >
-          <div className="w-full h-full bg-gradient-to-r from-blue-500 to-indigo-600 relative flex items-center justify-center text-white">
-            <AnimatePresence mode="wait" custom={isSignUp}>
-              {!isSignUp ? (
-                <motion.div
-                  key="signin-overlay"
-                  className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center"
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  variants={textVariants}
-                  custom={isSignUp}
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-ice-blue p-4 font-sans">
+        <div className="relative w-full max-w-[900px] h-[650px] bg-white rounded-[30px] shadow-2xl overflow-hidden flex border border-navy-primary/5">
+          
+          {/* Sign Up Form (Left Side) - Visible when isSignUp is true */}
+          <div
+            className={`absolute top-0 left-0 w-1/2 h-full flex flex-col justify-center items-center p-12 bg-white transition-all duration-[1200ms] ease-in-out ${
+              isSignUp ? "opacity-100 translate-x-0 z-20" : "opacity-0 translate-x-full z-10 pointer-events-none"
+            }`}
+          >
+                      <form className="w-full flex flex-col items-center space-y-4" onSubmit={handleSubmit}>
+                        <img src={logo} alt="FleetFlow Logo" className="w-12 h-12 object-contain mb-2" />
+                        <h1 className="text-4xl font-bold text-navy-primary mb-2">Sign up</h1>
+                        <div className="w-full space-y-3">                <Input
+                  type="text"
+                  placeholder="Full Name"
+                  icon={<User className="w-5 h-5" />}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required={isSignUp}
+                />
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  icon={<Mail className="w-5 h-5" />}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  icon={<Lock className="w-5 h-5" />}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <Select
+                  icon={<Briefcase className="w-5 h-5" />}
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  required={isSignUp}
                 >
-                  <h1 className="text-3xl font-bold mb-4">New here?</h1>
-                  <p className="mb-8 text-lg text-blue-100">
-                    Join us today and discover a world of possibilities. Create your
-                    account in seconds!
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="w-40 border-2 font-semibold pointer-events-auto"
-                    onClick={() => setIsSignUp(true)}
-                  >
-                    SIGN UP
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="signup-overlay"
-                  className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center"
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  variants={textVariants}
-                  custom={isSignUp}
-                >
-                  <h1 className="text-3xl font-bold mb-4">One of us?</h1>
-                  <p className="mb-8 text-lg text-blue-100">
-                    Welcome back! Sign in to continue your journey with us.
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="w-40 border-2 font-semibold pointer-events-auto"
-                    onClick={() => setIsSignUp(false)}
-                  >
-                    SIGN IN
-                  </Button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <option value="Dispatcher">Dispatcher</option>
+                  <option value="FinancialAnalyst">Financial Analyst</option>
+                  <option value="FleetManager">Fleet Manager</option>
+                  <option value="SafetyOfficer">Safety Officer</option>
+                </Select>
+              </div>
+              
+              {error && isSignUp && <p className="text-red-500 text-xs text-center">{error}</p>}
+  
+              <Button type="submit" className="w-40 mt-4 bg-navy-primary hover:bg-navy-primary/90">
+                SIGN UP
+              </Button>
+            </form>
           </div>
-        </motion.div>
+  
+          {/* Sign In Form (Right Side) - Visible when !isSignUp */}
+          <div
+            className={`absolute top-0 right-0 w-1/2 h-full flex flex-col justify-center items-center p-12 bg-white transition-all duration-[1200ms] ease-in-out ${
+              !isSignUp ? "opacity-100 translate-x-0 z-20" : "opacity-0 -translate-x-full z-10 pointer-events-none"
+            }`}
+          >
+                      <form className="w-full flex flex-col items-center space-y-4" onSubmit={handleSubmit}>
+                        <img src={logo} alt="FleetFlow Logo" className="w-12 h-12 object-contain mb-2" />
+                        <h1 className="text-4xl font-bold text-navy-primary mb-6">Sign in</h1>
+                        <div className="w-full space-y-4">                <Input
+                  type="email"
+                  placeholder="Email"
+                  icon={<Mail className="w-5 h-5" />}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  icon={<Lock className="w-5 h-5" />}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+  
+              {error && !isSignUp && <p className="text-red-500 text-xs text-center">{error}</p>}
+  
+              <Button type="submit" className="w-40 mt-6 bg-navy-primary hover:bg-navy-primary/90">
+                LOGIN
+              </Button>
+  
+            </form>
+          </div>
+  
+          {/* Overlay Container */}
+          <motion.div
+            className="absolute top-0 h-full z-50 overflow-hidden pointer-events-none"
+            initial={false}
+            animate={{
+              left: isSignUp ? ["0%", "0%", "50%"] : ["50%", "0%", "0%"],
+              width: ["50%", "100%", "50%"],
+              borderTopRightRadius: isSignUp ? ["100px", "100px", "0px"] : ["0px", "0px", "100px"],
+              borderBottomRightRadius: isSignUp ? ["100px", "100px", "0px"] : ["0px", "0px", "100px"],
+              borderTopLeftRadius: isSignUp ? ["0px", "0px", "100px"] : ["100px", "100px", "0px"],
+              borderBottomLeftRadius: isSignUp ? ["0px", "0px", "100px"] : ["100px", "100px", "0px"],
+            }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+          >
+            <div className="w-full h-full bg-gradient-to-r from-navy-primary to-indigo-900 relative flex items-center justify-center text-white">
+              <AnimatePresence mode="wait" custom={isSignUp}>
+                {!isSignUp ? (
+                  <motion.div
+                    key="signin-overlay"
+                    className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center"
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    variants={textVariants}
+                    custom={isSignUp}
+                  >
+                    <h1 className="text-3xl font-bold mb-4">New here?</h1>
+                    <p className="mb-8 text-lg text-blue-100/70">
+                      Join us today and discover a world of possibilities. Create your
+                      account in seconds!
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="w-40 border-2 font-semibold pointer-events-auto"
+                      onClick={() => setIsSignUp(true)}
+                    >
+                      SIGN UP
+                    </Button>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="signup-overlay"
+                    className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center"
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    variants={textVariants}
+                    custom={isSignUp}
+                  >
+                    <h1 className="text-3xl font-bold mb-4">One of us?</h1>
+                    <p className="mb-8 text-lg text-blue-100/70">
+                      Welcome back! Sign in to continue your journey with us.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="w-40 border-2 font-semibold pointer-events-auto"
+                      onClick={() => setIsSignUp(false)}
+                    >
+                      SIGN IN
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default SigninandSignup;

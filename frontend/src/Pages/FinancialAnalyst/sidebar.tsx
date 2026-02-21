@@ -9,14 +9,22 @@ import {
     ChevronRight
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import logo from "../../assets/logo.png";
 
 export type ViewType = 'overview' | 'vehicles' | 'drivers' | 'maintenance' | 'reports' | 'settings';
 
 export function Sidebar() {
     const location = useLocation();
+    const navigate = useNavigate();
     const currentPath = location.pathname.split('/').pop() || 'overview';
     const activeView = currentPath === 'financial-analyst' ? 'overview' : currentPath;
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/auth');
+    };
 
     const navItems = [
         { id: 'overview', label: 'Overview', icon: LayoutDashboard, path: '/financial-analyst' },
@@ -27,12 +35,10 @@ export function Sidebar() {
     ] as const;
 
     return (
-        <aside className="w-64 bg-primary text-white flex flex-col shrink-0 h-screen sticky top-0">
+        <aside className="w-64 bg-navy-primary text-white flex flex-col shrink-0 h-screen sticky top-0">
             <div className="p-6 flex items-center gap-3">
-                <div className="bg-accent-gold p-2 rounded-lg">
-                    <Truck className="text-primary size-6" strokeWidth={2.5} />
-                </div>
-                <h1 className="text-xl font-extrabold tracking-tight">FleetPro</h1>
+                <img src={logo} alt="FleetFlow Logo" className="w-10 h-10 object-contain" />
+                <h1 className="text-xl font-extrabold tracking-tight text-white">FleetFlow</h1>
             </div>
 
             <nav className="flex-1 px-4 space-y-2 mt-4">
@@ -72,7 +78,10 @@ export function Sidebar() {
                     <Settings className="size-5" />
                     <span className="font-semibold text-sm">Settings</span>
                 </Link>
-                <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-rose-400 hover:bg-rose-400/10 transition-all">
+                <button 
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-rose-400 hover:bg-rose-400/10 transition-all"
+                >
                     <LogOut className="size-5" />
                     <span className="font-semibold text-sm">Logout</span>
                 </button>

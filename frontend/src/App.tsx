@@ -17,10 +17,11 @@ function App() {
     <Router>
       <Routes>
         <Route path="/auth" element={<SigninandSignup />} />
+        <Route path="/" element={<Home />} />
         
         {/* Protected Routes */}
         <Route element={<ProtectedRoute allowedRoles={allRoles} />}>
-          <Route path="/" element={<Home />} />
+          {/* Add other general protected routes here if needed */}
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={['Dispatcher']} />}>
