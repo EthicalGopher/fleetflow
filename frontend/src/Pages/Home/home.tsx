@@ -1,39 +1,69 @@
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+
 const Home = () => {
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/auth');
+  };
+
+  const getDashboardPath = (role: string) => {
+    switch (role) {
+      case 'Dispatcher': return '/dispatcher';
+      case 'FinancialAnalyst': return '/financial-analyst';
+      case 'FleetManager': return '/fleet-manager';
+      case 'SafetyOfficer': return '/safety-officer';
+      default: return '/';
+    }
+  };
+
+  // Optional: Auto-redirect if they are already logged in and land here
+  useEffect(() => {
+    if (user.role) {
+       // Uncomment if you want auto-redirect
+       // navigate(getDashboardPath(user.role));
+    }
+  }, [user.role, navigate]);
+
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-4">Welcome Home</h1>
-      <div className="bg-white shadow rounded-lg p-6">
-        <p className="text-lg">Hello, <strong>{user.full_name}</strong>!</p>
-        <p className="text-gray-600">Your role is: <span className="text-indigo-600 font-semibold">{user.role}</span></p>
-      </div>
-      <div className="mt-6 space-y-4">
-        <p>You can access your dashboard based on your role:</p>
-        <div className="flex gap-4">
-          {user.role === 'Dispatcher' && (
-            <a href="/dispatcher" className="bg-indigo-600 text-white px-4 py-2 rounded">Go to Dispatcher Dashboard</a>
-          )}
-          {user.role === 'FinancialAnalyst' && (
-            <a href="/financial-analyst" className="bg-indigo-600 text-white px-4 py-2 rounded">Go to Financial Analyst Dashboard</a>
-          )}
-          {user.role === 'FleetManager' && (
-            <a href="/fleet-manager" className="bg-indigo-600 text-white px-4 py-2 rounded">Go to Fleet Manager Dashboard</a>
-          )}
-          {user.role === 'SafetyOfficer' && (
-            <a href="/safety-officer" className="bg-indigo-600 text-white px-4 py-2 rounded">Go to Safety Officer Dashboard</a>
-          )}
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="bg-white max-w-md w-full rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-blue-600 px-8 py-6">
+          <h1 className="text-2xl font-bold text-white text-center">Welcome Back</h1>
+          <p className="text-blue-100 text-center mt-1">FleetFlow Portal</p>
         </div>
-        <button 
-          onClick={() => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/auth';
-          }}
-          className="mt-8 text-red-600 hover:text-red-800"
-        >
-          Logout
-        </button>
+        
+        <div className="p-8">
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-blue-600">
+              {user.full_name ? user.full_name.charAt(0) : 'U'}
+            </div>
+            <h2 className="text-xl font-bold text-slate-800">{user.full_name || 'User'}</h2>
+            <span className="inline-block mt-2 px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full uppercase tracking-wide">
+              {user.role || 'Guest'}
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            <button
+              onClick={() => navigate(getDashboardPath(user.role))}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-sm flex items-center justify-center"
+            >
+              Access Dashboard
+            </button>
+            
+            <button 
+              onClick={handleLogout}
+              className="w-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-red-600 font-medium py-3 px-4 rounded-xl transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

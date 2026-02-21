@@ -1,47 +1,45 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import SigninandSignup from './Pages/SigninandSignup';
 import Home from './Pages/Home/home';
-import DispatcherDashboard from './Pages/Dispatcher/index';
-import FinancialAnalystDashboard from './Pages/FinancialAnalyst/index';
-import FleetManagerDashboard from './Pages/FleetManager/index';
-import SafetyOfficerDashboard from './Pages/SaftyOfficer/index';
+import DispatcherDashboard from './Pages/Dispatcher';
+import FinancialAnalystDashboard from './Pages/FinancialAnalyst';
+import FleetManagerDashboard from './Pages/FleetManager';
+import SafetyOfficerDashboard from './Pages/SafetyOfficer';
 
 // Specialized ProtectAccess components
-import DispatcherProtect from './Pages/Dispatcher/ProtectAccess';
-import FinancialAnalystProtect from './Pages/FinancialAnalyst/ProtectAccess';
-import FleetManagerProtect from './Pages/FleetManager/ProtectAccess';
-import SafetyOfficerProtect from './Pages/SaftyOfficer/ProtectAccess';
-import GeneralProtect from './Pages/ProtectAccess';
+import ProtectedRoute from './Pages/ProtectAccess';
 
 function App() {
+  const allRoles = ['Dispatcher', 'FinancialAnalyst', 'FleetManager', 'SafetyOfficer', 'user'];
+
   return (
     <Router>
       <Routes>
         <Route path="/auth" element={<SigninandSignup />} />
         
         {/* Protected Routes */}
-        <Route element={<GeneralProtect allowedRoles={['Dispatcher', 'FinancialAnalyst', 'FleetManager', 'SafetyOfficer']} />}>
+        <Route element={<ProtectedRoute allowedRoles={allRoles} />}>
           <Route path="/" element={<Home />} />
         </Route>
 
-        <Route element={<DispatcherProtect />}>
+        <Route element={<ProtectedRoute allowedRoles={['Dispatcher']} />}>
           <Route path="/dispatcher" element={<DispatcherDashboard />} />
         </Route>
 
-        <Route element={<FinancialAnalystProtect />}>
+        <Route element={<ProtectedRoute allowedRoles={['FinancialAnalyst']} />}>
           <Route path="/financial-analyst" element={<FinancialAnalystDashboard />} />
         </Route>
 
-        <Route element={<FleetManagerProtect />}>
+        <Route element={<ProtectedRoute allowedRoles={['FleetManager']} />}>
           <Route path="/fleet-manager" element={<FleetManagerDashboard />} />
         </Route>
 
-        <Route element={<SafetyOfficerProtect />}>
+        <Route element={<ProtectedRoute allowedRoles={['SafetyOfficer']} />}>
           <Route path="/safety-officer" element={<SafetyOfficerDashboard />} />
         </Route>
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/auth" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

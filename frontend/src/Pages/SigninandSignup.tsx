@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { User, Mail, Lock, Briefcase } from "lucide-react";
-import { FaGoogle, FaFacebookF, FaTwitter, FaLinkedinIn } from "react-icons/fa";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useNavigate } from 'react-router-dom';
@@ -97,38 +96,6 @@ const Select = React.forwardRef<HTMLSelectElement, InputProps>(
   }
 );
 Select.displayName = "Select";
-
-// SocialIcons Component
-function SocialIcons() {
-  return (
-    <div className="flex justify-center space-x-4 mt-4">
-      <a
-        href="#"
-        className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors"
-      >
-        <FaGoogle />
-      </a>
-      <a
-        href="#"
-        className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 text-blue-600 hover:bg-blue-50 transition-colors"
-      >
-        <FaFacebookF />
-      </a>
-      <a
-        href="#"
-        className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 text-blue-400 hover:bg-blue-50 transition-colors"
-      >
-        <FaTwitter />
-      </a>
-      <a
-        href="#"
-        className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 text-blue-700 hover:bg-blue-50 transition-colors"
-      >
-        <FaLinkedinIn />
-      </a>
-    </div>
-  );
-}
 
 // --- Main App Component ---
 
