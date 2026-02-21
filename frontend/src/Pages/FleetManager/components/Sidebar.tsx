@@ -27,7 +27,10 @@ export default function Sidebar({ currentView, setCurrentView }: SidebarProps) {
         </div>
       </div>
       <nav className="flex-1 px-4 py-6 space-y-1">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium">
+        <button 
+          onClick={() => setCurrentView('dashboard')}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'dashboard' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
+        >
           <LayoutDashboard size={20} />
           Dashboard
         </button>
@@ -45,11 +48,17 @@ export default function Sidebar({ currentView, setCurrentView }: SidebarProps) {
           <Wrench size={20} />
           Maintenance Log
         </button>
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium">
+        <button 
+          onClick={() => setCurrentView('drivers')}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'drivers' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
+        >
           <Users size={20} />
           Drivers
         </button>
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors text-sm font-medium">
+        <button 
+          onClick={() => setCurrentView('reports')}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'reports' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
+        >
           <BarChart size={20} />
           Reports
         </button>
