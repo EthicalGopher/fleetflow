@@ -8,6 +8,7 @@ import SafetyOfficerDashboard from './Pages/SafetyOfficer';
 
 // Specialized ProtectAccess components
 import ProtectedRoute from './Pages/ProtectAccess';
+import FinancialAnalystProtect from './Pages/FinancialAnalyst/ProtectAccess';
 
 function App() {
   const allRoles = ['Dispatcher', 'FinancialAnalyst', 'FleetManager', 'SafetyOfficer', 'user'];
@@ -26,8 +27,8 @@ function App() {
           <Route path="/dispatcher" element={<DispatcherDashboard />} />
         </Route>
 
-        <Route element={<ProtectedRoute allowedRoles={['FinancialAnalyst']} />}>
-          <Route path="/financial-analyst" element={<FinancialAnalystDashboard />} />
+        <Route element={<FinancialAnalystProtect />}>
+          <Route path="/financial-analyst/*" element={<FinancialAnalystDashboard />} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={['FleetManager']} />}>
