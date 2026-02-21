@@ -126,6 +126,16 @@ func Connect() {
 		location TEXT NOT NULL,
 		date DATE NOT NULL,
 		status TEXT DEFAULT 'Under Investigation'
+	);
+
+	CREATE TABLE IF NOT EXISTS drivers (
+		id TEXT PRIMARY KEY,
+		name TEXT NOT NULL,
+		email TEXT UNIQUE NOT NULL,
+		phone TEXT,
+		location TEXT,
+		status TEXT DEFAULT 'Active',
+		rating FLOAT DEFAULT 5.0
 	);`
 
 	_, err = DB.Exec(businessTablesQuery)
@@ -165,6 +175,13 @@ func Connect() {
 	VALUES 
 		('I001', 'Accident', 'Hwy 401', '2023-11-02', 'Under Investigation'),
 		('I002', 'Speeding Violation', 'City Center', '2023-11-04', 'Resolved')
+	ON CONFLICT (id) DO NOTHING;
+
+	INSERT INTO drivers (id, name, email, phone, location, status, rating)
+	VALUES 
+		('DR-001', 'John Smith', 'john.smith@fleetflow.com', '+1 555 0101', 'New York', 'Active', 4.8),
+		('DR-002', 'Sarah Wilson', 'sarah.w@fleetflow.com', '+1 555 0102', 'Chicago', 'Active', 4.9),
+		('DR-003', 'Robert Brown', 'robert.b@fleetflow.com', '+1 555 0103', 'Boston', 'On Leave', 4.5)
 	ON CONFLICT (id) DO NOTHING;
 	`
 	_, err = DB.Exec(seedDataQuery)

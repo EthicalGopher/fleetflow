@@ -10,12 +10,17 @@ interface SidebarProps {
 
 export default function Sidebar({ currentView, setCurrentView }: SidebarProps) {
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/auth');
   };
+
+  const initials = user.full_name 
+    ? user.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase() 
+    : 'U';
 
   return (
     <aside className="w-64 bg-navy-primary text-slate-300 flex flex-col shrink-0 fixed h-full z-20">
@@ -36,21 +41,21 @@ export default function Sidebar({ currentView, setCurrentView }: SidebarProps) {
         </button>
         <button 
           onClick={() => setCurrentView('registry')}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'registry' || currentView === 'add-vehicle' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'registry' || currentView === 'add-vehicle' || currentView === 'edit-vehicle' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
         >
           <Truck size={20} />
           Fleet Registry
         </button>
         <button 
           onClick={() => setCurrentView('maintenance')}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'maintenance' || currentView === 'add-maintenance' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'maintenance' || currentView === 'add-maintenance' || currentView === 'edit-maintenance' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
         >
           <Wrench size={20} />
           Maintenance Log
         </button>
         <button 
           onClick={() => setCurrentView('drivers')}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'drivers' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${currentView === 'drivers' || currentView === 'add-driver' || currentView === 'edit-driver' ? 'bg-primary-orange text-white font-bold shadow-lg shadow-primary-orange/20' : 'hover:bg-white/5 font-medium'}`}
         >
           <Users size={20} />
           Drivers
@@ -69,12 +74,12 @@ export default function Sidebar({ currentView, setCurrentView }: SidebarProps) {
           Settings
         </button>
         <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5">
-          <div className="size-10 rounded-full bg-navy-primary flex items-center justify-center text-white font-bold border border-white/10">
-            JD
+          <div className="size-10 rounded-full bg-navy-primary flex items-center justify-center text-white font-bold border border-white/10 uppercase">
+            {initials}
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <p className="text-sm font-semibold text-white truncate">James Dupont</p>
-            <p className="text-xs text-white/40 truncate">Fleet Director</p>
+            <p className="text-sm font-semibold text-white truncate">{user.full_name || 'User'}</p>
+            <p className="text-xs text-white/40 truncate">{user.role || 'Guest'}</p>
           </div>
           <button 
             onClick={handleLogout}

@@ -1,16 +1,38 @@
 import type { View } from '../types';
+import { useEffect, useState } from 'react';
+import { api } from '../../../lib/api';
+import { Trash2 } from 'lucide-react';
 
 interface VehicleRegistryProps {
   setCurrentView: (view: View) => void;
+  onEdit: (vehicle: any) => void;
 }
 
-export default function VehicleRegistry({ setCurrentView }: VehicleRegistryProps) {
-  // Mock data - replace with API call
-  const vehicles = [
-    { id: 'V001', make: 'Toyota', model: 'Hilux', year: 2023, status: 'Active', mileage: '12,450 km' },
-    { id: 'V002', make: 'Ford', model: 'Ranger', year: 2022, status: 'Maintenance', mileage: '45,200 km' },
-    { id: 'V003', make: 'Isuzu', model: 'D-Max', year: 2024, status: 'Active', mileage: '5,100 km' },
-  ];
+export default function VehicleRegistry({ setCurrentView, onEdit }: VehicleRegistryProps) {
+  const [vehicles, setVehicles] = useState<any[]>([]);
+
+  const fetchVehicles = () => {
+    api.get('/vehicles').then(data => {
+        if (Array.isArray(data)) {
+            setVehicles(data);
+        }
+    });
+  };
+
+  useEffect(() => {
+    fetchVehicles();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm(`Are you sure you want to delete vehicle ${id}?`)) {
+        const response = await api.delete(`/vehicles/${id}`);
+        if (response && !response.error) {
+            fetchVehicles();
+        } else {
+            alert(response.error || 'Failed to delete vehicle');
+        }
+    }
+  };
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -54,7 +76,20 @@ export default function VehicleRegistry({ setCurrentView }: VehicleRegistryProps
                   </td>
                   <td className="px-6 py-4">{vehicle.mileage}</td>
                   <td className="px-6 py-4 text-right">
-                    <button className="text-blue-600 hover:text-blue-800 font-medium">Edit</button>
+                    <div className="flex justify-end gap-3">
+                        <button 
+                            onClick={() => onEdit(vehicle)}
+                            className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                            Edit
+                        </button>
+                        <button 
+                            onClick={() => handleDelete(vehicle.id)}
+                            className="text-rose-600 hover:text-rose-800 transition-colors"
+                        >
+                            <Trash2 size={18} />
+                        </button>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -1,20 +1,58 @@
 import { cn } from '../../../lib/utils';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { api } from '../../../lib/api';
+import type { View } from '../types';
 
-const drivers = [
-  { id: 'DR-001', name: 'John Smith', status: 'Active', email: 'john.smith@fleetflow.com', phone: '+1 555 0101', location: 'New York', rating: 4.8 },
-  { id: 'DR-002', name: 'Sarah Wilson', status: 'Active', email: 'sarah.w@fleetflow.com', phone: '+1 555 0102', location: 'Chicago', rating: 4.9 },
-  { id: 'DR-003', name: 'Robert Brown', status: 'On Leave', email: 'robert.b@fleetflow.com', phone: '+1 555 0103', location: 'Boston', rating: 4.5 },
-  { id: 'DR-004', name: 'Emily Davis', status: 'Active', email: 'emily.d@fleetflow.com', phone: '+1 555 0104', location: 'Austin', rating: 4.7 },
-  { id: 'DR-005', name: 'Michael Chen', status: 'Suspended', email: 'm.chen@fleetflow.com', phone: '+1 555 0105', location: 'Seattle', rating: 3.9 },
-];
+interface DriversProps {
+  setCurrentView: (view: View) => void;
+  onEdit: (driver: any) => void;
+}
 
-export default function Drivers() {
+export default function Drivers({ setCurrentView, onEdit }: DriversProps) {
+  const [drivers, setDrivers] = useState<any[]>([]);
+
+  const fetchDrivers = () => {
+    api.get('/drivers').then(data => {
+        if (Array.isArray(data)) {
+            setDrivers(data);
+        }
+    });
+  };
+
+  useEffect(() => {
+    fetchDrivers();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm(`Are you sure you want to delete driver ${id}?`)) {
+        const response = await api.delete(`/drivers/${id}`);
+        if (response && !response.error) {
+            fetchDrivers();
+        } else {
+            alert(response.error || 'Failed to delete driver');
+        }
+    }
+  };
+
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+            <h2 className="text-2xl font-bold text-slate-900">Drivers Directory</h2>
+            <p className="text-slate-500 mt-1">Manage fleet personnel and assignments</p>
+        </div>
+        <button 
+          onClick={() => setCurrentView('add-driver')}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+        >
+          <span>+</span> Add Driver
+        </button>
+      </div>
+
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
-          <h3 className="text-lg font-extrabold text-slate-800">Drivers Directory</h3>
+          <h3 className="text-lg font-extrabold text-slate-800">Fleet Personnel</h3>
           <div className="flex gap-2">
             {['Active', 'On Leave', 'Suspended'].map((status) => (
               <span
@@ -42,6 +80,7 @@ export default function Drivers() {
                 <th className="px-8 py-4">Contact Info</th>
                 <th className="px-8 py-4">Location</th>
                 <th className="px-8 py-4 text-right">Rating</th>
+                <th className="px-8 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-sm font-bold">
@@ -79,6 +118,22 @@ export default function Drivers() {
                   </td>
                   <td className="px-8 py-5 text-right font-extrabold text-amber-500">
                     {driver.rating.toFixed(1)} ★
+                  </td>
+                  <td className="px-8 py-5 text-right">
+                    <div className="flex justify-end gap-3">
+                        <button 
+                            onClick={() => onEdit(driver)}
+                            className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                            Edit
+                        </button>
+                        <button 
+                            onClick={() => handleDelete(driver.id)}
+                            className="text-rose-600 hover:text-rose-800 transition-colors"
+                        >
+                            <Trash2 size={18} />
+                        </button>
+                    </div>
                   </td>
                 </tr>
               ))}

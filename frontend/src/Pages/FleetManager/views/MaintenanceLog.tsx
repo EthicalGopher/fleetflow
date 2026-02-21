@@ -1,14 +1,38 @@
 import type { View } from '../types';
+import { useEffect, useState } from 'react';
+import { api } from '../../../lib/api';
+import { Trash2 } from 'lucide-react';
 
 interface MaintenanceLogProps {
   setCurrentView: (view: View) => void;
+  onEdit: (log: any) => void;
 }
 
-export default function MaintenanceLog({ setCurrentView }: MaintenanceLogProps) {
-  const logs = [
-    { id: 'M001', vehicle: 'Toyota Hilux (V001)', date: '2023-10-15', type: 'Routine Service', cost: '$250', status: 'Completed' },
-    { id: 'M002', vehicle: 'Ford Ranger (V002)', date: '2023-11-02', type: 'Brake Replacement', cost: '$450', status: 'In Progress' },
-  ];
+export default function MaintenanceLog({ setCurrentView, onEdit }: MaintenanceLogProps) {
+  const [logs, setLogs] = useState<any[]>([]);
+
+  const fetchLogs = () => {
+    api.get('/maintenance').then(data => {
+        if (Array.isArray(data)) {
+            setLogs(data);
+        }
+    });
+  };
+
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm(`Are you sure you want to delete maintenance record #${id}?`)) {
+        const response = await api.delete(`/maintenance/${id}`);
+        if (response && !response.error) {
+            fetchLogs();
+        } else {
+            alert(response.error || 'Failed to delete maintenance log');
+        }
+    }
+  };
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -36,6 +60,7 @@ export default function MaintenanceLog({ setCurrentView }: MaintenanceLogProps) 
                 <th className="px-6 py-4">Service Type</th>
                 <th className="px-6 py-4">Cost</th>
                 <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -51,6 +76,22 @@ export default function MaintenanceLog({ setCurrentView }: MaintenanceLogProps) 
                       ${log.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
                       {log.status}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-3">
+                        <button 
+                            onClick={() => onEdit(log)}
+                            className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                            Edit
+                        </button>
+                        <button 
+                            onClick={() => handleDelete(log.id)}
+                            className="text-rose-600 hover:text-rose-800 transition-colors"
+                        >
+                            <Trash2 size={18} />
+                        </button>
+                    </div>
                   </td>
                 </tr>
               ))}

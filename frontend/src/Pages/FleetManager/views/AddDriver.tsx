@@ -2,19 +2,21 @@ import type { View } from '../types';
 import { useState, useEffect } from 'react';
 import { api } from '../../../lib/api';
 
-interface AddVehicleProps {
+interface AddDriverProps {
   setCurrentView: (view: View) => void;
   initialData?: any;
   isEdit?: boolean;
 }
 
-export default function AddVehicle({ setCurrentView, initialData, isEdit }: AddVehicleProps) {
+export default function AddDriver({ setCurrentView, initialData, isEdit }: AddDriverProps) {
   const [formData, setFormData] = useState({
     id: '',
-    make: '',
-    model: '',
-    year: new Date().getFullYear(),
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
     status: 'Active',
+    rating: 5.0,
   });
   const [loading, setLoading] = useState(false);
 
@@ -22,10 +24,12 @@ export default function AddVehicle({ setCurrentView, initialData, isEdit }: AddV
     if (isEdit && initialData) {
       setFormData({
         id: initialData.id,
-        make: initialData.make,
-        model: initialData.model,
-        year: initialData.year,
+        name: initialData.name,
+        email: initialData.email,
+        phone: initialData.phone,
+        location: initialData.location,
         status: initialData.status,
+        rating: initialData.rating,
       });
     }
   }, [isEdit, initialData]);
@@ -34,22 +38,17 @@ export default function AddVehicle({ setCurrentView, initialData, isEdit }: AddV
     e.preventDefault();
     setLoading(true);
     try {
-      const payload = {
-        ...formData,
-        year: parseInt(formData.year.toString()),
-      };
-      
       let response;
       if (isEdit) {
-        response = await api.put(`/vehicles/${formData.id}`, payload);
+        response = await api.put(`/drivers/${formData.id}`, formData);
       } else {
-        response = await api.post('/vehicles', payload);
+        response = await api.post('/drivers', formData);
       }
 
       if (response && !response.error) {
-        setCurrentView('registry');
+        setCurrentView('drivers');
       } else {
-        alert(response.error || `Failed to ${isEdit ? 'update' : 'add'} vehicle`);
+        alert(response.error || `Failed to ${isEdit ? 'update' : 'add'} driver`);
       }
     } catch (err) {
       alert('An error occurred');
@@ -62,13 +61,13 @@ export default function AddVehicle({ setCurrentView, initialData, isEdit }: AddV
     <div className="p-8 max-w-3xl mx-auto">
       <div className="flex items-center mb-8">
         <button 
-          onClick={() => setCurrentView('registry')}
+          onClick={() => setCurrentView('drivers')}
           className="mr-4 text-slate-400 hover:text-slate-600 transition-colors"
         >
           ← Back
         </button>
         <h2 className="text-2xl font-bold text-slate-900">
-            {isEdit ? 'Edit Vehicle' : 'Register New Vehicle'}
+            {isEdit ? 'Edit Driver' : 'Register New Driver'}
         </h2>
       </div>
 
@@ -76,24 +75,50 @@ export default function AddVehicle({ setCurrentView, initialData, isEdit }: AddV
         <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Make</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
                     <input 
                         type="text" 
                         required
-                        value={formData.make}
-                        onChange={(e) => setFormData({...formData, make: e.target.value})}
-                        placeholder="e.g. Toyota" 
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        placeholder="John Doe" 
                         className="w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5" 
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Model</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Driver ID</label>
                     <input 
                         type="text" 
                         required
-                        value={formData.model}
-                        onChange={(e) => setFormData({...formData, model: e.target.value})}
-                        placeholder="e.g. Hilux" 
+                        disabled={isEdit}
+                        value={formData.id}
+                        onChange={(e) => setFormData({...formData, id: e.target.value})}
+                        placeholder="DR-001" 
+                        className="w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5 disabled:bg-slate-50" 
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                    <input 
+                        type="email" 
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        placeholder="john@fleetflow.com" 
+                        className="w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5" 
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
+                    <input 
+                        type="text" 
+                        required
+                        value={formData.phone}
+                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                        placeholder="+1 555 0000" 
                         className="w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5" 
                     />
                 </div>
@@ -101,31 +126,16 @@ export default function AddVehicle({ setCurrentView, initialData, isEdit }: AddV
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Year</label>
-                    <input 
-                        type="number" 
-                        required
-                        value={formData.year}
-                        onChange={(e) => setFormData({...formData, year: parseInt(e.target.value)})}
-                        placeholder="2024" 
-                        className="w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5" 
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">License Plate (Vehicle ID)</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
                     <input 
                         type="text" 
                         required
-                        disabled={isEdit}
-                        value={formData.id}
-                        onChange={(e) => setFormData({...formData, id: e.target.value})}
-                        placeholder="ABC-1234" 
-                        className="w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5 disabled:bg-slate-50 disabled:text-slate-500" 
+                        value={formData.location}
+                        onChange={(e) => setFormData({...formData, location: e.target.value})}
+                        placeholder="City, State" 
+                        className="w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5" 
                     />
                 </div>
-            </div>
-
-            {isEdit && (
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
                     <select 
@@ -134,16 +144,16 @@ export default function AddVehicle({ setCurrentView, initialData, isEdit }: AddV
                         className="w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2.5 bg-white"
                     >
                         <option value="Active">Active</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Inactive">Inactive</option>
+                        <option value="On Leave">On Leave</option>
+                        <option value="Suspended">Suspended</option>
                     </select>
                 </div>
-            )}
+            </div>
 
              <div className="flex justify-end pt-6 border-t border-slate-100 mt-6 gap-3">
                 <button 
                     type="button"
-                    onClick={() => setCurrentView('registry')}
+                    onClick={() => setCurrentView('drivers')}
                     className="px-5 py-2.5 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 font-medium transition-colors"
                 >
                     Cancel
@@ -153,7 +163,7 @@ export default function AddVehicle({ setCurrentView, initialData, isEdit }: AddV
                     disabled={loading}
                     className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm transition-colors disabled:opacity-50"
                 >
-                    {loading ? 'Saving...' : (isEdit ? 'Update Vehicle' : 'Register Vehicle')}
+                    {loading ? 'Saving...' : (isEdit ? 'Update Driver' : 'Register Driver')}
                 </button>
             </div>
         </form>
