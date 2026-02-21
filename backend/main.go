@@ -48,6 +48,15 @@ func main() {
 	app.Use(server.AuthRequired)
 	app.Get("/me", server.Me)
 
+	// Business Routes
+	app.Get("/vehicles", server.GetVehicles)
+	app.Post("/vehicles", server.AddVehicle)
+	app.Get("/maintenance", server.GetMaintenanceLogs)
+	app.Post("/maintenance", server.AddMaintenanceLog)
+	app.Get("/shipments", server.GetShipments)
+	app.Get("/expenses", server.GetExpenses)
+	app.Get("/incidents", server.GetIncidents)
+
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"error": "Not Found"})

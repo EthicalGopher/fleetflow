@@ -78,4 +78,97 @@ func Connect() {
 	if err != nil {
 		log.Println("Note: Could not ensure 'role' column via ALTER TABLE:", err)
 	}
+
+	// Create business tables
+	businessTablesQuery := `
+	CREATE TABLE IF NOT EXISTS vehicles (
+		id TEXT PRIMARY KEY,
+		make TEXT NOT NULL,
+		model TEXT NOT NULL,
+		year INTEGER NOT NULL,
+		status TEXT DEFAULT 'Active',
+		mileage INTEGER DEFAULT 0,
+		fuel_efficiency FLOAT DEFAULT 0,
+		revenue FLOAT DEFAULT 0,
+		fuel_expense FLOAT DEFAULT 0,
+		maint_expense FLOAT DEFAULT 0,
+		idle_days INTEGER DEFAULT 0
+	);
+
+	CREATE TABLE IF NOT EXISTS maintenance_logs (
+		id SERIAL PRIMARY KEY,
+		vehicle_id TEXT REFERENCES vehicles(id),
+		date DATE NOT NULL,
+		type TEXT NOT NULL,
+		cost FLOAT DEFAULT 0,
+		status TEXT DEFAULT 'Pending'
+	);
+
+	CREATE TABLE IF NOT EXISTS shipments (
+		id TEXT PRIMARY KEY,
+		origin TEXT NOT NULL,
+		destination TEXT NOT NULL,
+		status TEXT DEFAULT 'Pending',
+		eta TEXT
+	);
+
+	CREATE TABLE IF NOT EXISTS expenses (
+		id TEXT PRIMARY KEY,
+		category TEXT NOT NULL,
+		amount FLOAT DEFAULT 0,
+		date DATE NOT NULL,
+		status TEXT DEFAULT 'Pending'
+	);
+
+	CREATE TABLE IF NOT EXISTS incidents (
+		id TEXT PRIMARY KEY,
+		type TEXT NOT NULL,
+		location TEXT NOT NULL,
+		date DATE NOT NULL,
+		status TEXT DEFAULT 'Under Investigation'
+	);`
+
+	_, err = DB.Exec(businessTablesQuery)
+	if err != nil {
+		log.Fatal("Failed to create business tables:", err)
+	}
+
+	// Seed Data
+	seedDataQuery := `
+	INSERT INTO vehicles (id, make, model, year, status, mileage, fuel_efficiency, revenue, fuel_expense, maint_expense, idle_days)
+	VALUES 
+		('V001', 'Toyota', 'Hilux', 2023, 'Active', 12450, 12.5, 12450, 3200, 850, 0),
+		('V002', 'Ford', 'Ranger', 2022, 'Maintenance', 45200, 11.2, 10120, 2900, 1200, 3),
+		('V003', 'Isuzu', 'D-Max', 2024, 'Active', 5100, 10.8, 6200, 4100, 1800, 0),
+		('V004', 'Tesla', 'Semi', 2024, 'Active', 1200, 25.0, 15000, 500, 200, 0)
+	ON CONFLICT (id) DO NOTHING;
+
+	INSERT INTO maintenance_logs (vehicle_id, date, type, cost, status)
+	VALUES 
+		('V001', '2023-10-15', 'Routine Service', 250, 'Completed'),
+		('V002', '2023-11-02', 'Brake Replacement', 450, 'In Progress')
+	ON CONFLICT DO NOTHING;
+
+	INSERT INTO shipments (id, origin, destination, status, eta)
+	VALUES 
+		('S001', 'New York', 'Boston', 'In Transit', '2 hrs'),
+		('S002', 'Chicago', 'Detroit', 'Pending', 'N/A')
+	ON CONFLICT (id) DO NOTHING;
+
+	INSERT INTO expenses (id, category, amount, date, status)
+	VALUES 
+		('E001', 'Fuel', 5400, '2023-11-01', 'Approved'),
+		('E002', 'Maintenance', 1200, '2023-11-05', 'Pending')
+	ON CONFLICT (id) DO NOTHING;
+
+	INSERT INTO incidents (id, type, location, date, status)
+	VALUES 
+		('I001', 'Accident', 'Hwy 401', '2023-11-02', 'Under Investigation'),
+		('I002', 'Speeding Violation', 'City Center', '2023-11-04', 'Resolved')
+	ON CONFLICT (id) DO NOTHING;
+	`
+	_, err = DB.Exec(seedDataQuery)
+	if err != nil {
+		log.Println("Note: Could not seed data:", err)
+	}
 }
