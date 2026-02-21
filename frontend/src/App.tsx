@@ -18,7 +18,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/auth" element={<SigninandSignup />} />
-        
+
         {/* Protected Routes */}
         <Route element={<GeneralProtect allowedRoles={['Dispatcher', 'FinancialAnalyst', 'FleetManager', 'SafetyOfficer']} />}>
           <Route path="/" element={<Home />} />
@@ -29,7 +29,7 @@ function App() {
         </Route>
 
         <Route element={<FinancialAnalystProtect />}>
-          <Route path="/financial-analyst" element={<FinancialAnalystDashboard />} />
+          <Route path="/financial-analyst/*" element={<FinancialAnalystDashboard />} />
         </Route>
 
         <Route element={<FleetManagerProtect />}>
